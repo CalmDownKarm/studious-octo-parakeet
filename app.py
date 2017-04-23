@@ -1,37 +1,32 @@
 from flask import Flask, jsonify, request,abort, make_response
+from upcoming_fights import upcoming_fights as u
 import json
 app = Flask(__name__)
 events = ['one','two','three']
-tasks = [
-    {
-        'id': 'lel1',
-        'title': u'Whittaker vs Souza',
-        'prediction': u'Souza',
-        'done': False
-    },
-    {
-        'id': 'lel2',
-        'title': u'Mcgregor vs Mayweather',
-        'description': u'Mcgregor',
-        'done': False
-    }
-]
+
 
 with open('Data/winners.json') as json_data:
   d = json.load(json_data)
-  print d
 
 @app.route('/')
 def index():
   return "STILL HERE!"
 
-@app.route('/api/v1.0/getprediction/<task_id>', methods=['GET'])
-def get_tasks(task_id):
-  task = [task for task in tasks if task['id']==task_id]
-  if(len(task)==0):
+@app.route('/api/v1.0/getprediction/<int:task_id>', methods=['GET'])
+def get_fight_by_id(fight_id):
+  fight = [fight for fight in u if fight['id']==fight_id]
+  if(len(fight)==0):
     abort(404)
   else:
-    return jsonify({'task':task[0]})
+    return jsonify({'fight':fight[0]})
+
+@app.route('/api/v1.0/getprediction/<title>', methods=['GET'])
+def get_fight_by_title(title):
+  fight = [fight for fight in u if fight['title']==title]
+  if(len(fight)==0):
+    abort(404)
+  else:
+    return jsonify({'fight':fight[0]})
 
 
 @app.errorhandler(404)
